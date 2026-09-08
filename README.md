@@ -1,87 +1,51 @@
-# AI Resume Analyzer API
+# 🤖 AI Resume Analyzer API
 
-AI-powered Resume Analyzer API built with FastAPI and Python.
+An intelligent Resume Analyzer API built with **Python and FastAPI** to extract resume content, identify technical skills, and provide structured resume analysis.
 
-## Features
+---
 
-- Upload Resume (PDF/Text)
-- Extract Resume Content
-- Detect Technical Skills
-- Analyze Resume Data
-- REST API with FastAPI
-- Interactive Swagger Documentation
+## 🚀 Features
 
-## Tech Stack
+- 📄 Upload Resume in PDF or TXT format
+- 🔍 Extract text from resumes
+- 🛠️ Detect technical skills
+- 📊 Analyze resume data
+- ✅ Resume input validation
+- ⚡ Fast REST API using FastAPI
+- 📚 Interactive Swagger API documentation
+- 🔒 Structured API responses using Pydantic
 
-- Python
-- FastAPI
-- Uvicorn
-- PyPDF
-- Pydantic
+---
 
-## Project Structure
+## 🛠️ Tech Stack
+
+| Technology | Purpose |
+|---|---|
+| Python | Core programming language |
+| FastAPI | REST API framework |
+| Uvicorn | ASGI server |
+| PyPDF | PDF text extraction |
+| Pydantic | Data validation & response schemas |
+| Git & GitHub | Version control |
+
+---
+
+## 📁 Project Structure
 
 ```text
 resume-analyzer/
 │
 ├── app/
+│   ├── __init__.py
 │   ├── main.py
 │   ├── schemas.py
 │   ├── resume_parser.py
 │   └── analyzer.py
 │
 ├── tests/
+│   ├── __init__.py
+│   └── test_api.py
+│
 ├── requirements.txt
-├── README.md
-└── .gitignore
-```
-
-## Installation
-
-```bash
-git clone https://github.com/devasheesh1112/resume-analyzer.git
-
-cd resume-analyzer
-
-python -m venv venv
-
-venv\Scripts\activate
-
-pip install -r requirements.txt
-```
-
-## Run Application
-
-```bash
-uvicorn app.main:app --reload
-```
-
-Open:
-
-```text
-http://127.0.0.1:8000/docs
-```
-
-## API Endpoint
-
-### Analyze Resume
-
-```http
-POST /analyze-resume
-```
-
-Upload a PDF resume and receive analysis results.
-
-## Future Improvements
-
-- AI-based Resume Analysis
-- Job Description Matching
-- Resume Score Calculation
-- PostgreSQL Integration
-- Docker Support
-- CI/CD Pipeline
-- GitHub Actions
-
-## Author
-
-Devasheesh Patidar
+├── .gitignore
+└── README.md
