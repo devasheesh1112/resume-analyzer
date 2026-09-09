@@ -1,23 +1,31 @@
 def analyze_resume(resume_text: str):
 
     skills_database = [
-        "Python",
-        "Django",
-        "FastAPI",
-        "Flask",
-        "PostgreSQL",
-        "MySQL",
-        "MongoDB",
-        "Redis",
-        "Docker",
-        "Kubernetes",
-        "Machine Learning",
-        "Deep Learning",
-        "TensorFlow",
-        "PyTorch",
-        "AWS",
-        "Git"
-    ]
+    "Python",
+    "Django",
+    "FastAPI",
+    "Flask",
+    "PostgreSQL",
+    "MySQL",
+    "MongoDB",
+    "Redis",
+    "Docker",
+    "Kubernetes",
+    "Machine Learning",
+    "Deep Learning",
+    "TensorFlow",
+    "PyTorch",
+    "AWS",
+    "Git",
+    "Java",
+    "C++",
+    "JavaScript",
+    "React",
+    "Node.js",
+    "SQL",
+    "REST API",
+    "Microservices"
+]
 
     found_skills = []
 
