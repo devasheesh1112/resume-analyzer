@@ -62,6 +62,13 @@ async def analyze_resume_api(file: UploadFile = File(...)):
             detail="No readable text found in the resume"
         )
 
+    # Validate minimum resume content
+    if len(resume_text.strip()) < 50:
+        raise HTTPException(
+            status_code=400,
+            detail="Resume content is too short to analyze"
+        )
+
     result = analyze_resume(resume_text)
 
     return result
