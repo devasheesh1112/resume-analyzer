@@ -28,7 +28,10 @@ def analyze_resume(resume_text: str):
 
     resume_lower = resume_text.lower()
 
-    # Detect technical skills
+    # -----------------------------
+    # Skill Detection
+    # -----------------------------
+
     found_skills = []
 
     for skill in skills_database:
@@ -36,16 +39,16 @@ def analyze_resume(resume_text: str):
             found_skills.append(skill)
 
     # -----------------------------
-    # Resume Score Calculation
+    # Resume Score
     # -----------------------------
 
     score = 0
 
-    # 1. Technical skills - 40 points
+    # Technical skills - 40 points
     skill_score = min(len(found_skills) * 3, 40)
     score += skill_score
 
-    # 2. Resume content length - 20 points
+    # Resume content - 20 points
     word_count = len(resume_text.split())
 
     if word_count >= 500:
@@ -57,7 +60,7 @@ def analyze_resume(resume_text: str):
     elif word_count >= 75:
         score += 5
 
-    # 3. Projects / Experience - 20 points
+    # Experience / Projects - 20 points
     experience_keywords = [
         "experience",
         "work experience",
@@ -74,7 +77,7 @@ def analyze_resume(resume_text: str):
 
     score += min(experience_matches * 4, 20)
 
-    # 4. Education - 10 points
+    # Education - 10 points
     education_keywords = [
         "education",
         "bachelor",
@@ -96,24 +99,125 @@ def analyze_resume(resume_text: str):
     elif education_matches == 1:
         score += 5
 
-    # 5. Contact information - 10 points
-    contact_score = 0
-
+    # Contact information - 10 points
     if "@" in resume_text:
-        contact_score += 5
+        score += 5
 
     if any(char.isdigit() for char in resume_text):
-        contact_score += 5
+        score += 5
 
-    score += contact_score
-
-    # Make sure score stays between 0 and 100
     score = min(score, 100)
+
+    # -----------------------------
+    # Missing Skills
+    # -----------------------------
+
+    recommended_skills = [
+        "Python",
+        "SQL",
+        "Git",
+        "REST API",
+        "Docker",
+        "PostgreSQL",
+        "Redis",
+        "AWS",
+        "Kubernetes",
+        "Microservices"
+    ]
+
+    missing_skills = [
+        skill
+        for skill in recommended_skills
+        if skill.lower() not in resume_lower
+    ]
+
+    # -----------------------------
+    # Strengths
+    # -----------------------------
+
+    strengths = []
+
+    if len(found_skills) >= 5:
+        strengths.append("Strong technical skill set")
+    elif len(found_skills) >= 3:
+        strengths.append("Good technical skill set")
+
+    if any(
+        keyword in resume_lower
+        for keyword in ["fastapi", "django", "flask", "rest api"]
+    ):
+        strengths.append("Backend development exposure")
+
+    if any(
+        keyword in resume_lower
+        for keyword in ["postgresql", "mysql", "mongodb", "sql"]
+    ):
+        strengths.append("Database knowledge")
+
+    if any(
+        keyword in resume_lower
+        for keyword in ["project", "projects"]
+    ):
+        strengths.append("Project experience")
+
+    if any(
+        keyword in resume_lower
+        for keyword in ["docker", "kubernetes", "aws"]
+    ):
+        strengths.append("Cloud and DevOps exposure")
+
+    if not strengths:
+        strengths.append("Resume has basic professional information")
+
+    # -----------------------------
+    # Experience Level
+    # -----------------------------
+
+    if any(
+        keyword in resume_lower
+        for keyword in [
+            "senior",
+            "lead developer",
+            "tech lead",
+            "principal engineer"
+        ]
+    ):
+        experience_level = "Senior Level"
+
+    elif any(
+        keyword in resume_lower
+        for keyword in [
+            "2 years",
+            "3 years",
+            "4 years",
+            "5 years",
+            "experience"
+        ]
+    ):
+        experience_level = "Mid Level"
+
+    elif any(
+        keyword in resume_lower
+        for keyword in [
+            "intern",
+            "internship",
+            "fresher",
+            "entry level"
+        ]
+    ):
+        experience_level = "Entry Level"
+
+    else:
+        experience_level = "Entry Level"
 
     return {
         "skills": found_skills,
         "skill_count": len(found_skills),
         "resume_score": score,
+        "strengths": strengths,
+        "missing_skills": missing_skills,
+        "experience_level": experience_level,
+        "word_count": word_count,
         "resume_length": len(resume_text),
         "status": "Resume analyzed successfully"
     }
