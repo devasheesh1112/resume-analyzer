@@ -12,3 +12,10 @@ class ResumeAnalysisResponse(BaseModel):
     word_count: int
     resume_length: int
     status: str
+
+
+class JobMatchResponse(BaseModel):
+    match_score: int
+    matched_skills: List[str]
+    missing_skills: List[str]
+    recommendation: str
