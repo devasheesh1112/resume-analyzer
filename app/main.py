@@ -4,7 +4,12 @@ from app.analyzer import analyze_resume, match_resume_with_job
 from app.resume_parser import extract_text
 from app.analyzer import analyze_resume
 from app.schemas import ResumeAnalysisResponse
-from app.schemas import ResumeAnalysisResponse, JobMatchResponse
+
+from app.schemas import (
+    ResumeAnalysisResponse,
+    JobMatchResponse,
+    AIResumeAnalysisResponse
+)
 
 app = FastAPI(
     title="AI Resume Analyzer",
@@ -129,5 +134,57 @@ async def match_job(
         resume_text,
         job_description
     )
+
+    return result
+
+@app.post(
+    "/ai-analyze-resume",
+    response_model=AIResumeAnalysisResponse
+)
+async def ai_analyze_resume(file: UploadFile = File(...)):
+
+    if not file.filename:
+        raise HTTPException(
+            status_code=400,
+            detail="Filename is required"
+        )
+
+    allowed_extensions = (".pdf", ".txt")
+
+    if not file.filename.lower().endswith(allowed_extensions):
+        raise HTTPException(
+            status_code=400,
+            detail="Only PDF and TXT files are supported"
+        )
+
+    content = await file.read()
+
+    if not content:
+        raise HTTPException(
+            status_code=400,
+            detail="Uploaded file is empty"
+        )
+
+    try:
+        resume_text = extract_text(content, file.filename)
+    except Exception:
+        raise HTTPException(
+            status_code=400,
+            detail="Unable to extract text from the uploaded file"
+        )
+
+    if not resume_text:
+        raise HTTPException(
+            status_code=400,
+            detail="No readable text found in the resume"
+        )
+
+    try:
+        result = analyze_resume_with_ai(resume_text)
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"AI analysis failed: {str(e)}"
+        )
 
     return result

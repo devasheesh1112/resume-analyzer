@@ -19,3 +19,7 @@ class JobMatchResponse(BaseModel):
     matched_skills: List[str]
     missing_skills: List[str]
     recommendation: str
+
+
+class AIResumeAnalysisResponse(BaseModel):
+    analysis: str
