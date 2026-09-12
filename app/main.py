@@ -1,15 +1,14 @@
 from fastapi import FastAPI, UploadFile, File, HTTPException
-from app.analyzer import analyze_resume, match_resume_with_job
 
 from app.resume_parser import extract_text
-from app.analyzer import analyze_resume
-from app.schemas import ResumeAnalysisResponse
-
+from app.analyzer import analyze_resume, match_resume_with_job
+from app.ai_analyzer import analyze_resume_with_ai
 from app.schemas import (
     ResumeAnalysisResponse,
     JobMatchResponse,
     AIResumeAnalysisResponse
 )
+
 
 app = FastAPI(
     title="AI Resume Analyzer",
@@ -25,6 +24,10 @@ def home():
         "version": "2.0.0"
     }
 
+
+# --------------------------------------------------
+# Resume Analysis
+# --------------------------------------------------
 
 @app.post(
     "/analyze-resume",
@@ -55,7 +58,10 @@ async def analyze_resume_api(file: UploadFile = File(...)):
         )
 
     try:
-        resume_text = extract_text(content, file.filename)
+        resume_text = extract_text(
+            content,
+            file.filename
+        )
     except Exception:
         raise HTTPException(
             status_code=400,
@@ -68,7 +74,6 @@ async def analyze_resume_api(file: UploadFile = File(...)):
             detail="No readable text found in the resume"
         )
 
-    # Validate minimum resume content
     if len(resume_text.strip()) < 50:
         raise HTTPException(
             status_code=400,
@@ -80,6 +85,10 @@ async def analyze_resume_api(file: UploadFile = File(...)):
     return result
 
 
+# --------------------------------------------------
+# Job Description Matching
+# --------------------------------------------------
+
 @app.post(
     "/match-job",
     response_model=JobMatchResponse
@@ -88,6 +97,7 @@ async def match_job(
     file: UploadFile = File(...),
     job_description: str = ""
 ):
+
     if not file.filename:
         raise HTTPException(
             status_code=400,
@@ -117,7 +127,10 @@ async def match_job(
         )
 
     try:
-        resume_text = extract_text(content, file.filename)
+        resume_text = extract_text(
+            content,
+            file.filename
+        )
     except Exception:
         raise HTTPException(
             status_code=400,
@@ -130,6 +143,12 @@ async def match_job(
             detail="No readable text found in the resume"
         )
 
+    if len(resume_text.strip()) < 50:
+        raise HTTPException(
+            status_code=400,
+            detail="Resume content is too short to analyze"
+        )
+
     result = match_resume_with_job(
         resume_text,
         job_description
@@ -137,11 +156,18 @@ async def match_job(
 
     return result
 
+
+# --------------------------------------------------
+# AI Resume Analysis
+# --------------------------------------------------
+
 @app.post(
     "/ai-analyze-resume",
     response_model=AIResumeAnalysisResponse
 )
-async def ai_analyze_resume(file: UploadFile = File(...)):
+async def ai_analyze_resume(
+    file: UploadFile = File(...)
+):
 
     if not file.filename:
         raise HTTPException(
@@ -166,7 +192,10 @@ async def ai_analyze_resume(file: UploadFile = File(...)):
         )
 
     try:
-        resume_text = extract_text(content, file.filename)
+        resume_text = extract_text(
+            content,
+            file.filename
+        )
     except Exception:
         raise HTTPException(
             status_code=400,
@@ -179,12 +208,21 @@ async def ai_analyze_resume(file: UploadFile = File(...)):
             detail="No readable text found in the resume"
         )
 
-    try:
-        result = analyze_resume_with_ai(resume_text)
-    except Exception as e:
+    if len(resume_text.strip()) < 50:
         raise HTTPException(
-            status_code=500,
-            detail=f"AI analysis failed: {str(e)}"
+            status_code=400,
+            detail="Resume content is too short to analyze"
         )
 
-    return result
+    try:
+        result = analyze_resume_with_ai(resume_text)
+
+        return result
+
+    except Exception as e:
+        print("AI ERROR:", repr(e))
+
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )

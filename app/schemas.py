@@ -22,4 +22,9 @@ class JobMatchResponse(BaseModel):
 
 
 class AIResumeAnalysisResponse(BaseModel):
-    analysis: str
+    summary: str
+    strengths: List[str]
+    weaknesses: List[str]
+    technical_skills: List[str]
+    improvements: List[str]
+    career_recommendations: List[str]

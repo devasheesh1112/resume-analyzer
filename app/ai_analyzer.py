@@ -2,7 +2,6 @@ import os
 from openai import OpenAI
 from dotenv import load_dotenv
 
-
 load_dotenv()
 
 api_key = os.getenv("OPENAI_API_KEY")
@@ -17,12 +16,12 @@ def analyze_resume_with_ai(resume_text: str):
     prompt = f"""
 You are an expert technical recruiter and resume reviewer.
 
-Analyze the following resume and provide a concise professional assessment.
+Analyze the resume below.
 
-Return the analysis in the following JSON structure:
+Return ONLY valid JSON with exactly these fields:
 
 {{
-    "summary": "Short professional summary of the candidate",
+    "summary": "A concise professional summary",
     "strengths": [
         "strength 1",
         "strength 2",
@@ -47,8 +46,9 @@ Return the analysis in the following JSON structure:
     ]
 }}
 
-Resume:
+Do not include markdown or ```json.
 
+Resume:
 {resume_text}
 """
 
@@ -57,6 +57,4 @@ Resume:
         input=prompt
     )
 
-    return {
-        "analysis": response.output_text
-    }
+    return response.output_text
