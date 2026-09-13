@@ -1,6 +1,9 @@
+import json
 import os
-from openai import OpenAI
+
 from dotenv import load_dotenv
+from openai import OpenAI
+
 
 load_dotenv()
 
@@ -9,10 +12,12 @@ api_key = os.getenv("OPENAI_API_KEY")
 if not api_key:
     raise RuntimeError("OPENAI_API_KEY is not configured")
 
+
 client = OpenAI(api_key=api_key)
 
 
 def analyze_resume_with_ai(resume_text: str):
+
     prompt = f"""
 You are an expert technical recruiter and resume reviewer.
 
@@ -46,9 +51,15 @@ Return ONLY valid JSON with exactly these fields:
     ]
 }}
 
-Do not include markdown or ```json.
+Rules:
+- Return only JSON.
+- Do not use markdown.
+- Do not include ```json.
+- Keep the analysis concise and professional.
+- Base the analysis only on the resume content.
 
 Resume:
+
 {resume_text}
 """
 
@@ -57,4 +68,28 @@ Resume:
         input=prompt
     )
 
-    return response.output_text
+    output = response.output_text.strip()
+
+    try:
+        result = json.loads(output)
+    except json.JSONDecodeError as e:
+        raise ValueError(
+            "AI returned an invalid JSON response"
+        ) from e
+
+    required_fields = [
+        "summary",
+        "strengths",
+        "weaknesses",
+        "technical_skills",
+        "improvements",
+        "career_recommendations"
+    ]
+
+    for field in required_fields:
+        if field not in result:
+            raise ValueError(
+                f"AI response is missing required field: {field}"
+            )
+
+    return result
