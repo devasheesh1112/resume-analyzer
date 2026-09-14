@@ -1,30 +1,35 @@
+from app.semantic_matcher import calculate_semantic_similarity
+
+
+SKILLS_DATABASE = [
+    "Python",
+    "Django",
+    "FastAPI",
+    "Flask",
+    "PostgreSQL",
+    "MySQL",
+    "MongoDB",
+    "Redis",
+    "Docker",
+    "Kubernetes",
+    "Machine Learning",
+    "Deep Learning",
+    "TensorFlow",
+    "PyTorch",
+    "AWS",
+    "Git",
+    "Java",
+    "C++",
+    "JavaScript",
+    "React",
+    "Node.js",
+    "SQL",
+    "REST API",
+    "Microservices"
+]
+
+
 def analyze_resume(resume_text: str):
-    skills_database = [
-        "Python",
-        "Django",
-        "FastAPI",
-        "Flask",
-        "PostgreSQL",
-        "MySQL",
-        "MongoDB",
-        "Redis",
-        "Docker",
-        "Kubernetes",
-        "Machine Learning",
-        "Deep Learning",
-        "TensorFlow",
-        "PyTorch",
-        "AWS",
-        "Git",
-        "Java",
-        "C++",
-        "JavaScript",
-        "React",
-        "Node.js",
-        "SQL",
-        "REST API",
-        "Microservices"
-    ]
 
     resume_lower = resume_text.lower()
 
@@ -34,7 +39,7 @@ def analyze_resume(resume_text: str):
 
     found_skills = []
 
-    for skill in skills_database:
+    for skill in SKILLS_DATABASE:
         if skill.lower() in resume_lower:
             found_skills.append(skill)
 
@@ -71,7 +76,8 @@ def analyze_resume(resume_text: str):
     ]
 
     experience_matches = sum(
-        1 for keyword in experience_keywords
+        1
+        for keyword in experience_keywords
         if keyword in resume_lower
     )
 
@@ -90,7 +96,8 @@ def analyze_resume(resume_text: str):
     ]
 
     education_matches = sum(
-        1 for keyword in education_keywords
+        1
+        for keyword in education_keywords
         if keyword in resume_lower
     )
 
@@ -223,93 +230,108 @@ def analyze_resume(resume_text: str):
     }
 
 
-def match_resume_with_job(resume_text: str, job_description: str):
-    skills_database = [
-        "Python",
-        "Django",
-        "FastAPI",
-        "Flask",
-        "PostgreSQL",
-        "MySQL",
-        "MongoDB",
-        "Redis",
-        "Docker",
-        "Kubernetes",
-        "Machine Learning",
-        "Deep Learning",
-        "TensorFlow",
-        "PyTorch",
-        "AWS",
-        "Git",
-        "Java",
-        "C++",
-        "JavaScript",
-        "React",
-        "Node.js",
-        "SQL",
-        "REST API",
-        "Microservices"
-    ]
+def match_resume_with_job(
+    resume_text: str,
+    job_description: str
+):
+    """
+    Hybrid resume-job matching.
+
+    Final score:
+        40% keyword matching
+        60% semantic similarity
+    """
 
     resume_lower = resume_text.lower()
     job_lower = job_description.lower()
 
-    # Skills required by the job
+    # -----------------------------
+    # Keyword Matching
+    # -----------------------------
+
     job_skills = [
         skill
-        for skill in skills_database
+        for skill in SKILLS_DATABASE
         if skill.lower() in job_lower
     ]
 
-    # Skills present in the resume
     resume_skills = [
         skill
-        for skill in skills_database
+        for skill in SKILLS_DATABASE
         if skill.lower() in resume_lower
     ]
 
-    # Skills present in both
     matched_skills = [
         skill
         for skill in job_skills
         if skill in resume_skills
     ]
 
-    # Required skills missing from resume
     missing_skills = [
         skill
         for skill in job_skills
         if skill not in resume_skills
     ]
 
-    # Calculate match score
-    if not job_skills:
-        match_score = 0
-    else:
-        match_score = round(
-            (len(matched_skills) / len(job_skills)) * 100
+    if job_skills:
+        keyword_score = round(
+            (len(matched_skills) / len(job_skills)) * 100,
+            2
         )
+    else:
+        keyword_score = 0.0
 
-    # Generate recommendation
+    # -----------------------------
+    # Semantic Matching
+    # -----------------------------
+
+    semantic_score = calculate_semantic_similarity(
+        resume_text,
+        job_description
+    )
+
+    # -----------------------------
+    # Hybrid Score
+    # -----------------------------
+
+    match_score = round(
+        (keyword_score * 0.40) +
+        (semantic_score * 0.60),
+        2
+    )
+
+    # -----------------------------
+    # Recommendation
+    # -----------------------------
+
     if match_score >= 80:
         recommendation = (
-            "Excellent match. Your resume aligns well with the job requirements."
+            "Excellent match. Your resume aligns well "
+            "with the job requirements."
         )
+
     elif match_score >= 60:
         recommendation = (
-            "Good match. Consider improving the missing skills before applying."
+            "Good match. Consider improving the missing "
+            "skills before applying."
         )
+
     elif match_score >= 40:
         recommendation = (
-            "Moderate match. Your resume needs improvement in several required skills."
+            "Moderate match. Your resume needs improvement "
+            "in several required areas."
         )
+
     else:
         recommendation = (
-            "Low match. Focus on the missing skills required for this role."
+            "Low match. Focus on the missing skills and "
+            "experience required for this role."
         )
 
     return {
         "match_score": match_score,
+        "keyword_score": keyword_score,
+        "semantic_score": semantic_score,
         "matched_skills": matched_skills,
         "missing_skills": missing_skills,
         "recommendation": recommendation

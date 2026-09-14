@@ -15,7 +15,9 @@ class ResumeAnalysisResponse(BaseModel):
 
 
 class JobMatchResponse(BaseModel):
-    match_score: int
+    match_score: float
+    keyword_score: float
+    semantic_score: float
     matched_skills: List[str]
     missing_skills: List[str]
     recommendation: str
