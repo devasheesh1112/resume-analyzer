@@ -180,3 +180,7 @@ resume-analyzer/
 ├── requirements.txt
 ├── .gitignore
 └── README.md
+
+
+Name
+Devasheesh Patidar
