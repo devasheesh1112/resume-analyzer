@@ -182,5 +182,5 @@ resume-analyzer/
 └── README.md
 
 
-Name
+Name owner
 Devasheesh Patidar
